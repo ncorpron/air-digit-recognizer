@@ -1,7 +1,7 @@
 # 🖐️ Air Digit Recognizer
 
-![Air Digit Demo](recordings/air_digit_demo.gif)
 
+![Air Digit Demo](recordings/air_digit_demo.gif)
 
 Draw digits in the air with your hand and have them recognized by a Convolutional Neural Network (CNN) trained on MNIST!
 
