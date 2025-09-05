@@ -1,11 +1,10 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-import tensorflow as tf
 from tensorflow.keras.models import load_model
 
-# Load MNIST CNN model
-model = load_model('mnist_cnn.h5')
+# ----- Load your trained MNIST CNN model -----
+model = load_model('air_digit_cnn_trained.keras')
 
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
@@ -16,6 +15,9 @@ drawing = False        # Flag to track if drawing is active
 
 cap = cv2.VideoCapture(0)
 
+# Create CLAHE object for adaptive contrast/brightness
+clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+
 with mp_hands.Hands(max_num_hands=1,
                     min_detection_confidence=0.7,
                     min_tracking_confidence=0.7) as hands:
@@ -24,6 +26,14 @@ with mp_hands.Hands(max_num_hands=1,
         ret, frame = cap.read()
         if not ret:
             break
+
+        # ----- Adjust brightness/contrast -----
+        # Convert to LAB color space for better light handling
+        lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
+        l, a, b = cv2.split(lab)
+        l = clahe.apply(l)           # Apply CLAHE to L channel
+        lab = cv2.merge((l, a, b))
+        frame = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
 
         frame = cv2.flip(frame, 1)
         h, w, _ = frame.shape
